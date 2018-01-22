@@ -6,6 +6,7 @@
     <attr name="FailColor" format="color"/>
     <attr name="SuccessColor" format="color"/>
     <attr name="Speed" format="integer"/>
+    <attr name="GoneDelay" format="integer"/>
 
 
 </declare-styleable>

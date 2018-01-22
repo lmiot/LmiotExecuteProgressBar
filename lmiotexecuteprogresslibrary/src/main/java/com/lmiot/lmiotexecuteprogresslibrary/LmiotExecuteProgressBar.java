@@ -6,11 +6,13 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.TranslateAnimation;
+
 
 /**
  * 创建日期：2018-01-20 16:53
@@ -31,7 +33,8 @@ public class LmiotExecuteProgressBar extends View {
     private Paint mPaintFail;
     private int mNum=0;
     private String mMflag="";
-    private int mSpeed;
+    private int mSpeed=5;
+    private int mDelay=3;
     private String mFailText;
     private String mSuccessText;
 
@@ -51,6 +54,7 @@ public class LmiotExecuteProgressBar extends View {
         mSuccessColor = typedArray.getColor(R.styleable.LmiotExecuteProgressBar_SuccessColor, Color.GREEN);
         mFailColor = typedArray.getColor(R.styleable.LmiotExecuteProgressBar_FailColor, Color.RED);
         mSpeed = typedArray.getInteger(R.styleable.LmiotExecuteProgressBar_Speed, 10);
+        mDelay = typedArray.getInteger(R.styleable.LmiotExecuteProgressBar_GoneDelay, 3);
 
 
 
@@ -76,6 +80,9 @@ public class LmiotExecuteProgressBar extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+
+        Log.d("LmiotExecuteProgressBar", "onDraw");
+
           /*得到view的宽高*/
         int width = getWidth();
         int height = getHeight();
@@ -83,17 +90,22 @@ public class LmiotExecuteProgressBar extends View {
             int   i = (int)(width * mNum / 100);
 
             if(mMflag.equals("success")){
+                setVisibility(VISIBLE);
 
                 canvas.drawRect(new Rect(0,0, width, height),mPaintSuccess);
                 drawTextMethod(width,height,canvas,mPaintText,mSuccessText+"");
+                setGone();
 
             }
            else if(mMflag.equals("fail")){
+                setVisibility(VISIBLE);
                 canvas.drawRect(new Rect(0,0, width, height),mPaintFail);
                 drawTextMethod(width,height,canvas,mPaintText,mFailText+"");
+                setGone();
 
             }
             else{
+                setVisibility(VISIBLE);
                 canvas.drawRect(new Rect(0,0, i, height),mPaintProgress);
                 drawTextMethod(i,height,canvas,mPaintText,mNum+"%");
             }
@@ -101,11 +113,20 @@ public class LmiotExecuteProgressBar extends View {
 
         }
         else{
+            setVisibility(VISIBLE);
             canvas.drawRect(new Rect(0,0, 0, height),mPaintProgress);
         }
 
     }
 
+    private void setGone() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                setVisibility(GONE);
+            }
+        },mDelay*1000);
+    }
 
 
     private void drawTextMethod(int width,int height,Canvas canvas,Paint paint,String text) {
@@ -121,17 +142,19 @@ public class LmiotExecuteProgressBar extends View {
     }
 
     public void setSuccess(String value){
+        setVisibility(VISIBLE);
         mMflag = "success";
         mSuccessText = value;
         postInvalidate();
     }
     public void setFail(String value){
+        setVisibility(VISIBLE);
         mMflag = "fail";
         mFailText = value;
         postInvalidate();
     }
     public void setProgress(final int progress){
-
+        setVisibility(VISIBLE);
         mMflag = "";
         mNum=0;
         new Thread(){
@@ -144,6 +167,7 @@ public class LmiotExecuteProgressBar extends View {
                         mNum++;
                         postInvalidate();
                         if(mNum>=progress){
+                            postInvalidate();
                             break;
                         }
 
@@ -161,23 +185,5 @@ public class LmiotExecuteProgressBar extends View {
     }
 
 
-    /**
-     * 获取文字宽度
-     * @param content
-     * @param paint
-     * @return
-     */
-    public int getTextWidth(String content,Paint paint){
-        int width = 0;
-        if(content!=null&&content.length()>0){
-            int length = content.length();
-            float[] widths = new float[length];
-            paint.getTextWidths(content,widths);
-            for (int i = 0; i < length; i++) {
-                width += (int)Math.ceil(widths[i]);
-            }
-        }
-        return width;
-    }
 
 }
