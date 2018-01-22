@@ -42,13 +42,11 @@ public class LmiotExecuteProgressBar extends View {
     private int mDelay=3;
     private String mFailText;
     private String mSuccessText;
-    private  Handler mHandler=new Handler(){
-
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-        }
-    };
+    private Thread mThread;
+    private Handler mHandler;
+    private Runnable mRunnable;
+    private Handler mHandler01;
+    private Runnable mRunnable01;
 
 
     public LmiotExecuteProgressBar(Context context) {
@@ -132,12 +130,27 @@ public class LmiotExecuteProgressBar extends View {
     }
 
     private void setGone() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                setVisibility(GONE);
+        try {
+            //5秒后还没结果,则消失
+            if(mHandler01!=null){
+                mHandler01.removeCallbacks(mRunnable01);
+                mRunnable01=null;
+                mHandler01=null;
+
             }
-        },mDelay*1000);
+
+
+            mHandler01 = new Handler();
+            mRunnable01 = new Runnable() {
+                @Override
+                public void run() {
+                    setVisibility(GONE);
+                }
+            };
+            mHandler01.postDelayed(mRunnable01,mDelay*1000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -165,46 +178,68 @@ public class LmiotExecuteProgressBar extends View {
         mFailText = value;
         postInvalidate();
     }
+
+
+
+
     public void setProgress(final int progress){
-        setVisibility(VISIBLE);
-        mMflag = "";
-        mNum=0;
-        new Thread(){
-            @Override
-            public void run() {
-                while (true){
+        try {
+            setVisibility(VISIBLE);
+            mMflag = "";
+            mNum=0;
+            if(mThread!=null){
+                mThread.interrupt();
+                mThread=null;
+            }
 
-                    try {
-                        sleep(mSpeed);
-                        mNum++;
-                        postInvalidate();
-                        if(mNum>=progress){
+            mThread = new Thread() {
+                @Override
+                public void run() {
+                    while (true) {
 
-                            break;
+                        try {
+                            sleep(mSpeed);
+                            mNum++;
+                            postInvalidate();
+                            if (mNum >= progress) {
+
+                                break;
+                            }
+
+
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
 
+                    }
+                }
+            };
+            mThread.start();
 
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+
+            //5秒后还没结果,则消失
+            if(mHandler!=null){
+                mHandler.removeCallbacks(mRunnable);
+                mRunnable=null;
+                mHandler=null;
+
+            }
+
+
+            mHandler = new Handler();
+            mRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    if (TextUtils.isEmpty(mMflag)) {
+                        setFail("等待超时！");
                     }
 
                 }
-            }
-        }.start();
-
-
-
-        //5秒后还没结果,则消失
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if(TextUtils.isEmpty(mMflag)){
-                   setFail("等待超时！");
-                }
-
-            }
-        },(mDelay+1)*1000);
-
+            };
+            mHandler.postDelayed(mRunnable,(mDelay+1)*1000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
     }
