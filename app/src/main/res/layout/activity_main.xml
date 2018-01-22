@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.lmiot.lmiotexecuteprogressbar.MainActivity"
+    android:orientation="vertical"
+    >
+
+
+
+    <com.lmiot.lmiotexecuteprogresslibrary.LmiotExecuteProgressBar
+        android:id="@+id/id_lm"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        app:TextColor="@color/colorAccent"
+        app:FailColor="@color/fail"
+        app:PrgressColor="@color/success"
+        app:SuccessColor="@color/success"
+        app:Speed="5"
+        />
+
+    <TextView
+        android:id="@+id/id_test"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center_vertical"
+        android:text="开始"
+        />
+    <TextView
+        android:id="@+id/id_test_1"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center_vertical"
+        android:text="成功"
+        />
+    <TextView
+        android:id="@+id/id_test_2"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center_vertical"
+        android:text="失败"
+        />
+
+
+
+</LinearLayout>

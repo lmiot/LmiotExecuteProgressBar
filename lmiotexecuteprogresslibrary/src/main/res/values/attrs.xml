@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<declare-styleable name="LmiotExecuteProgressBar">
+    <attr name="TextColor" format="color"/>
+    <attr name="PrgressColor" format="color"/>
+    <attr name="FailColor" format="color"/>
+    <attr name="SuccessColor" format="color"/>
+    <attr name="Speed" format="integer"/>
+
+
+</declare-styleable>
+</resources>
