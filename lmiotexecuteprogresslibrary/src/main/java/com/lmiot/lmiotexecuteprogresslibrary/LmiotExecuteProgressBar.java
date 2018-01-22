@@ -7,11 +7,16 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.TextureView;
 import android.view.View;
 import android.view.animation.TranslateAnimation;
+import android.widget.TextView;
 
 
 /**
@@ -37,6 +42,13 @@ public class LmiotExecuteProgressBar extends View {
     private int mDelay=3;
     private String mFailText;
     private String mSuccessText;
+    private  Handler mHandler=new Handler(){
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+        }
+    };
 
 
     public LmiotExecuteProgressBar(Context context) {
@@ -167,7 +179,7 @@ public class LmiotExecuteProgressBar extends View {
                         mNum++;
                         postInvalidate();
                         if(mNum>=progress){
-                            postInvalidate();
+
                             break;
                         }
 
@@ -179,6 +191,19 @@ public class LmiotExecuteProgressBar extends View {
                 }
             }
         }.start();
+
+
+
+        //5秒后还没结果,则消失
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(TextUtils.isEmpty(mMflag)){
+                    setGone();
+                }
+
+            }
+        },(mDelay+1)*1000);
 
 
 
