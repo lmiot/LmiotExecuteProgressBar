@@ -197,6 +197,13 @@ public class LmiotExecuteProgressBar extends View {
 
             }
 
+            if(mHandler01!=null){
+                mHandler01.removeCallbacks(mRunnable01);
+                mRunnable01=null;
+                mHandler01=null;
+
+            }
+
 
 
             if(progress!=100){
