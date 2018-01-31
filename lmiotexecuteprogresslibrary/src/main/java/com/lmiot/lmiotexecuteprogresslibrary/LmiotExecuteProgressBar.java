@@ -165,13 +165,13 @@ public class LmiotExecuteProgressBar extends View {
         setVisibility(VISIBLE);
         mMflag = "success";
         mSuccessText = value;
-        postInvalidate();
+        invalidate();
     }
     public void setFail(String value){
         setVisibility(VISIBLE);
         mMflag = "fail";
         mFailText = value;
-        postInvalidate();
+        invalidate();
     }
 
 
