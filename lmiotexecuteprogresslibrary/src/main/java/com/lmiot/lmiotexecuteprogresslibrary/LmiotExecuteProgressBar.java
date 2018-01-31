@@ -186,64 +186,69 @@ public class LmiotExecuteProgressBar extends View {
                 mMflag = "";
                 mNum=0;
 
+                if(mThread!=null){
+                    mThread.interrupt();
+                    mThread=null;
+                }
+
+                mThread = new Thread() {
+                    @Override
+                    public void run() {
+                        while (true) {
+
+                            try {
+                                sleep(mSpeed);
+                                mNum++;
+                                postInvalidate();
+                                if (mNum >= progress) {
+
+                                    break;
+                                }
+
+
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }
+                };
+                mThread.start();
+
+
+                //5秒后还没结果,则消失
+                if(mHandler!=null){
+                    mHandler.removeCallbacks(mRunnable);
+                    mRunnable=null;
+                    mHandler=null;
+
+                }
+
+
+                mHandler = new Handler();
+                mRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        if (TextUtils.isEmpty(mMflag)) {
+                            setFail("等待超时！");
+                        }
+
+                    }
+                };
+                mHandler.postDelayed(mRunnable,(mDelay+1)*1000);
+
+
             }
             else{
                 mMflag = "success";
                 mNum=100;
                 mSuccessText="操作成功!";
+                postInvalidate();
             }
 
 
-            if(mThread!=null){
-                mThread.interrupt();
-                mThread=null;
-            }
-
-            mThread = new Thread() {
-                @Override
-                public void run() {
-                    while (true) {
-
-                        try {
-                            sleep(mSpeed);
-                            mNum++;
-                            postInvalidate();
-                            if (mNum >= progress) {
-
-                                break;
-                            }
 
 
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-                }
-            };
-            mThread.start();
-
-
-            //5秒后还没结果,则消失
-            if(mHandler!=null){
-                mHandler.removeCallbacks(mRunnable);
-                mRunnable=null;
-                mHandler=null;
-
-            }
-
-
-            mHandler = new Handler();
-            mRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    if (TextUtils.isEmpty(mMflag)) {
-                        setFail("等待超时！");
-                    }
-
-                }
-            };
-            mHandler.postDelayed(mRunnable,(mDelay+1)*1000);
         } catch (Exception e) {
             e.printStackTrace();
         }
