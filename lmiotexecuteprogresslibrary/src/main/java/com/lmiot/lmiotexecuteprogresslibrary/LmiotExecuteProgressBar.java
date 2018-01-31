@@ -7,16 +7,11 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.TextureView;
 import android.view.View;
-import android.view.animation.TranslateAnimation;
-import android.widget.TextView;
 
 
 /**
@@ -231,7 +226,7 @@ public class LmiotExecuteProgressBar extends View {
                 @Override
                 public void run() {
                     if (TextUtils.isEmpty(mMflag)) {
-                        setFail("等待超时！");
+                        //setFail("等待超时！");
                     }
 
                 }
@@ -243,6 +238,8 @@ public class LmiotExecuteProgressBar extends View {
 
 
     }
+
+
 
 
 
