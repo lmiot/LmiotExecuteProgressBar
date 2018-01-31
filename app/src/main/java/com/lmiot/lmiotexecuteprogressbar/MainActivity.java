@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         textView1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mLmiotExecuteProgressBar.setSuccess("操作成功");
+                mLmiotExecuteProgressBar.setProgress(100);
             }
         });
         textView2.setOnClickListener(new View.OnClickListener() {

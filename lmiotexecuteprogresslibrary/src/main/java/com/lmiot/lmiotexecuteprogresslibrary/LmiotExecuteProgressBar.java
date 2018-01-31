@@ -110,6 +110,8 @@ public class LmiotExecuteProgressBar extends View {
 
             }
             else{
+
+
                 setVisibility(VISIBLE);
                 canvas.drawRect(new Rect(0,0, i, height),mPaintProgress);
                 drawTextMethod(i,height,canvas,mPaintText,mNum+"%");
@@ -180,8 +182,18 @@ public class LmiotExecuteProgressBar extends View {
     public void setProgress(final int progress){
         try {
             setVisibility(VISIBLE);
-            mMflag = "";
-            mNum=0;
+            if(progress!=100){
+                mMflag = "";
+                mNum=0;
+
+            }
+            else{
+                mMflag = "success";
+                mNum=100;
+                mSuccessText="操作成功!";
+            }
+
+
             if(mThread!=null){
                 mThread.interrupt();
                 mThread=null;
