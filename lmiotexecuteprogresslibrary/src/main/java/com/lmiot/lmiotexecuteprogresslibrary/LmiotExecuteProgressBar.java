@@ -181,15 +181,28 @@ public class LmiotExecuteProgressBar extends View {
 
     public void setProgress(final int progress){
         try {
+
             setVisibility(VISIBLE);
+
+            if(mThread!=null){
+                mThread.interrupt();
+                mThread=null;
+            }
+
+            //5秒后还没结果,则消失
+            if(mHandler!=null){
+                mHandler.removeCallbacks(mRunnable);
+                mRunnable=null;
+                mHandler=null;
+
+            }
+
+
+
             if(progress!=100){
                 mMflag = "";
                 mNum=0;
 
-                if(mThread!=null){
-                    mThread.interrupt();
-                    mThread=null;
-                }
 
                 mThread = new Thread() {
                     @Override
@@ -216,13 +229,7 @@ public class LmiotExecuteProgressBar extends View {
                 mThread.start();
 
 
-                //5秒后还没结果,则消失
-                if(mHandler!=null){
-                    mHandler.removeCallbacks(mRunnable);
-                    mRunnable=null;
-                    mHandler=null;
 
-                }
 
 
                 mHandler = new Handler();
@@ -240,6 +247,8 @@ public class LmiotExecuteProgressBar extends View {
 
             }
             else{
+
+
                 mMflag = "success";
                 mNum=100;
                 mSuccessText="操作成功!";
