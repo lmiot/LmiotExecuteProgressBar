@@ -226,7 +226,7 @@ public class LmiotExecuteProgressBar extends View {
                 @Override
                 public void run() {
                     if (TextUtils.isEmpty(mMflag)) {
-                        //setFail("等待超时！");
+                        setFail("等待超时！");
                     }
 
                 }
