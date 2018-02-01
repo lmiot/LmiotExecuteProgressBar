@@ -40,8 +40,8 @@ public class LmiotExecuteProgressBar extends View {
     private int mDelay=3;
     private String mFailText="等待超时！";
     private String mSuccessText="操作成功！";
-    private static int TypeSuccess=100;
-    private static int TypeFail=-1;
+    private  int TypeSuccess=100;
+    private  int TypeFail=-1;
     private Runnable mRunnable;
     private Handler mHandler;
     private TimerTask mTask;
