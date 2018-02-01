@@ -205,15 +205,8 @@ public class LmiotExecuteProgressBar extends View {
             }
 
 
-            if(progress==-1){
-                mMflag = "fail";
-                mNum = 100;
-                mFailText="等待超时！";
-                postInvalidate();
-            }
 
 
-           else {
                 if (progress != 100) {
                     mMflag = "";
                     mNum = 0;
@@ -250,7 +243,10 @@ public class LmiotExecuteProgressBar extends View {
                         public void run() {
                             if (TextUtils.isEmpty(mMflag)) {
 
-                                setProgress(-1);
+                                mMflag = "fail";
+                                mNum = 100;
+                                mFailText="等待超时！";
+                                postInvalidate();
                             }
 
                         }
@@ -267,7 +263,6 @@ public class LmiotExecuteProgressBar extends View {
                     postInvalidate();
                 }
 
-            }
 
 
         } catch (Exception e) {
