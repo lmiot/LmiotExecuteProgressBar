@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         textView2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mLmiotExecuteProgressBar.setFail("操作失败,请重试!");
+                mLmiotExecuteProgressBar.setProgress(-1);
             }
         });
     }

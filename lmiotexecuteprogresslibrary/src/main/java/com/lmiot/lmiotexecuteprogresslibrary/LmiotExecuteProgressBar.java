@@ -7,11 +7,14 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 /**
@@ -32,16 +35,28 @@ public class LmiotExecuteProgressBar extends View {
     private Paint mPaintSuccess;
     private Paint mPaintFail;
     private int mNum=0;
-    private String mMflag="";
+    private int mFlag=999;
     private int mSpeed=5;
     private int mDelay=3;
-    private String mFailText;
-    private String mSuccessText;
-    private Thread mThread;
-    private Handler mHandler;
+    private String mFailText="等待超时！";
+    private String mSuccessText="操作成功！";
+    private static int TypeSuccess=100;
+    private static int TypeFail=-1;
     private Runnable mRunnable;
-    private Handler mHandler01;
-    private Runnable mRunnable01;
+    private Handler mHandler;
+    private TimerTask mTask;
+    private Timer mTimer;
+
+    private  Handler mHandlerNew=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            if(msg.what==0x122){
+                setGone(mFlag);
+            }
+
+        }
+    };
+
 
 
     public LmiotExecuteProgressBar(Context context) {
@@ -52,7 +67,6 @@ public class LmiotExecuteProgressBar extends View {
         super(context, attrs);
 
         TypedArray typedArray = context.getTheme().obtainStyledAttributes(attrs, R.styleable.LmiotExecuteProgressBar, 0, 0);
-
 
         mTextColor = typedArray.getColor(R.styleable.LmiotExecuteProgressBar_TextColor, Color.BLACK);
         mProgressColor = typedArray.getColor(R.styleable.LmiotExecuteProgressBar_PrgressColor, Color.GRAY);
@@ -85,69 +99,64 @@ public class LmiotExecuteProgressBar extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-
-        Log.d("LmiotExecuteProgressBar", "onDraw");
-
           /*得到view的宽高*/
         int width = getWidth();
         int height = getHeight();
-        if(mNum!=0){
-            int   i = (int)(width * mNum / 100);
 
-            if(mMflag.equals("success")){
-                setVisibility(VISIBLE);
+        switch (mFlag){
 
+
+            case 100:
                 canvas.drawRect(new Rect(0,0, width, height),mPaintSuccess);
                 drawTextMethod(width,height,canvas,mPaintText,mSuccessText+"");
-                setGone();
-
-            }
-           else if(mMflag.equals("fail")){
-                setVisibility(VISIBLE);
+                setGone(mFlag);
+                break;
+            case -1:
                 canvas.drawRect(new Rect(0,0, width, height),mPaintFail);
                 drawTextMethod(width,height,canvas,mPaintText,mFailText+"");
-                setGone();
+                setGone(mFlag);
+                break;
+            case 999: //默认不处理
+                break;
+            default:
 
-            }
-            else{
+                    int   i = (int)(width * mNum / 100);
+                    canvas.drawRect(new Rect(0,0, i, height),mPaintProgress);
+                    drawTextMethod(i,height,canvas,mPaintText,mNum+"%");
 
 
-                setVisibility(VISIBLE);
-                canvas.drawRect(new Rect(0,0, i, height),mPaintProgress);
-                drawTextMethod(i,height,canvas,mPaintText,mNum+"%");
-            }
 
-
+                break;
         }
-        else{
-            setVisibility(VISIBLE);
-            canvas.drawRect(new Rect(0,0, 0, height),mPaintProgress);
-        }
+
+
 
     }
 
-    private void setGone() {
-        try {
-            //5秒后还没结果,则消失
-            if(mHandler01!=null){
-                mHandler01.removeCallbacks(mRunnable01);
-                mRunnable01=null;
-                mHandler01=null;
-
-            }
+    private void setGone(final int flag) {
 
 
-            mHandler01 = new Handler();
-            mRunnable01 = new Runnable() {
-                @Override
-                public void run() {
+
+            mHandler = new Handler();
+            mRunnable = new Runnable() {
+            @Override
+            public void run() {
+
+                if(mFlag==-1||mFlag==100){ //超时或成功后延时消失
                     setVisibility(GONE);
                 }
-            };
-            mHandler01.postDelayed(mRunnable01,mDelay*1000);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                else{ //进度动画完成后
+                    setProgress(-1);
+
+                }
+
+            }
+        };
+
+         mHandler.postDelayed(mRunnable,mDelay*2000);
+
+
+
     }
 
 
@@ -163,110 +172,71 @@ public class LmiotExecuteProgressBar extends View {
 
     }
 
-    public void setSuccess(String value){
-        setVisibility(VISIBLE);
-        mMflag = "success";
-        mSuccessText = value;
-        invalidate();
-    }
-    public void setFail(String value){
-        setVisibility(VISIBLE);
-        mMflag = "";
-        mFailText = value;
-        invalidate();
-    }
-
-
 
 
     public void setProgress(final int progress){
-        try {
+
+        if(mTimer!=null){
+            mTask.cancel();
+            mTimer.cancel();
+            mTask=null;
+            mTimer=null;
+
+        }
+
+        if(mHandler!=null){
+            mHandler.removeCallbacks(mRunnable);
+            mHandler=null;
+            mRunnable=null;
+
+        }
+
+
+
+        if(progress==-1){  //等待超时
+            mFlag =TypeFail;
+            invalidate();
+
+        }
+        else if( progress==100){ //成功
+            setVisibility(VISIBLE);
+            mFlag =TypeSuccess;
+            invalidate();
+        }
+        else{ //加载进度
 
             setVisibility(VISIBLE);
 
-            if(mThread!=null){
-                mThread.interrupt();
-                mThread=null;
-            }
-
-            //5秒后还没结果,则消失
-            if(mHandler!=null){
-                mHandler.removeCallbacks(mRunnable);
-                mRunnable=null;
-                mHandler=null;
-
-            }
-
-            if(mHandler01!=null){
-                mHandler01.removeCallbacks(mRunnable01);
-                mRunnable01=null;
-                mHandler01=null;
-
-            }
+            mNum = 0;
+            mFlag =progress;
 
 
 
-
-                if (progress != 100) {
-                    mMflag = "";
-                    mNum = 0;
-
-
-                    mThread = new Thread() {
-                        @Override
-                        public void run() {
-                            while (true) {
-
-                                try {
-                                    sleep(mSpeed);
-                                    mNum++;
-                                    postInvalidate();
-                                    if (mNum >= progress) {
-
-                                        break;
-                                    }
-
-
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-
-                            }
-                        }
-                    };
-                    mThread.start();
-
-
-                    mHandler = new Handler();
-                    mRunnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            if (TextUtils.isEmpty(mMflag)) {
-
-                                mMflag = "fail";
-                                mNum = 100;
-                                mFailText="等待超时！";
-                                postInvalidate();
-                            }
-
-                        }
-                    };
-                    mHandler.postDelayed(mRunnable, (mDelay + 1) * 1000);
-
-
-                } else {
-
-
-                    mMflag = "success";
-                    mNum = 100;
-                    mSuccessText = "操作成功!";
+            mTimer = new Timer();
+            mTask = new TimerTask() {
+                @Override
+                public void run() {
+                    mNum++;
                     postInvalidate();
+                    if(mNum<=progress){
+                        postInvalidate();
+
+                        Log.d("LmiotExecuteProgressBar", "定时进行中……");
+                    }
+                    else{
+                        cancel();
+                        mHandlerNew.sendEmptyMessage(0x122);
+
+
+
+                    }
+
+
+
                 }
+            };
+            mTimer.schedule(mTask,mSpeed,mSpeed);
 
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
 
