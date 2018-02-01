@@ -171,7 +171,7 @@ public class LmiotExecuteProgressBar extends View {
     }
     public void setFail(String value){
         setVisibility(VISIBLE);
-        mMflag = "fail";
+        mMflag = "";
         mFailText = value;
         invalidate();
     }
@@ -205,64 +205,69 @@ public class LmiotExecuteProgressBar extends View {
             }
 
 
-
-            if(progress!=100){
-                mMflag = "";
-                mNum=0;
-
-
-                mThread = new Thread() {
-                    @Override
-                    public void run() {
-                        while (true) {
-
-                            try {
-                                sleep(mSpeed);
-                                mNum++;
-                                postInvalidate();
-                                if (mNum >= progress) {
-
-                                    break;
-                                }
-
-
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-                    }
-                };
-                mThread.start();
-
-
-
-
-
-                mHandler = new Handler();
-                mRunnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        if (TextUtils.isEmpty(mMflag)) {
-                            setFail("等待超时！");
-                        }
-
-                    }
-                };
-                mHandler.postDelayed(mRunnable,(mDelay+1)*1000);
-
-
-            }
-            else{
-
-
-                mMflag = "success";
-                mNum=100;
-                mSuccessText="操作成功!";
+            if(progress==-1){
+                mMflag = "fail";
+                mNum = 100;
+                mFailText="等待超时！";
                 postInvalidate();
             }
 
 
+           else {
+                if (progress != 100) {
+                    mMflag = "";
+                    mNum = 0;
+
+
+                    mThread = new Thread() {
+                        @Override
+                        public void run() {
+                            while (true) {
+
+                                try {
+                                    sleep(mSpeed);
+                                    mNum++;
+                                    postInvalidate();
+                                    if (mNum >= progress) {
+
+                                        break;
+                                    }
+
+
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+                        }
+                    };
+                    mThread.start();
+
+
+                    mHandler = new Handler();
+                    mRunnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            if (TextUtils.isEmpty(mMflag)) {
+
+                                setProgress(-1);
+                            }
+
+                        }
+                    };
+                    mHandler.postDelayed(mRunnable, (mDelay + 1) * 1000);
+
+
+                } else {
+
+
+                    mMflag = "success";
+                    mNum = 100;
+                    mSuccessText = "操作成功!";
+                    postInvalidate();
+                }
+
+            }
 
 
         } catch (Exception e) {
