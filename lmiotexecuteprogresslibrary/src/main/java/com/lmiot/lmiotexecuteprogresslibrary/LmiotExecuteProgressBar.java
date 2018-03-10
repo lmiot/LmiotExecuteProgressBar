@@ -38,6 +38,11 @@ public class LmiotExecuteProgressBar extends View {
     private int mFlag=999;
     private int mSpeed=5;
     private int mDelay=3;
+
+    public void setFailText(String failText) {
+        mFailText = failText;
+    }
+
     private String mFailText="等待超时！";
     private String mSuccessText="操作成功！";
     private  int TypeSuccess=100;
